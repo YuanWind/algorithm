@@ -76,84 +76,84 @@
 ##### 1. 递归：直接或间接的调用自身的算法称为递归算法
 ##### 2. 排列算法
 
-    ```
-    void Perm(int list[],int k,int m)
+```
+void Perm(int list[],int k,int m)
+{
+    if(k==m)
     {
-        if(k==m)
+        for(int i=0;i<=m;i++)
+            cout<<list[i];
+    }
+    else
+    {
+        for(int i=k;i<=m;i++)
         {
-            for(int i=0;i<=m;i++)
-                cout<<list[i];
-        }
-        else
-        {
-            for(int i=k;i<=m;i++)
-            {
-                swap(list[k],list[i]);
-                Perm(list,k+1,m);
-                swap(list[k],list[i]);
-            }
+            swap(list[k],list[i]);
+            Perm(list,k+1,m);
+            swap(list[k],list[i]);
         }
     }
+}
 
-    ```
+```
 
 ##### 3. 分治解快速排序
 
-    ```
-    int Partition(int a[],int p,int r)
+```
+int Partition(int a[],int p,int r)
+{
+    int i=p,j=r+1;
+    int x=a[p];
+    //将小于x的元素交换到左边，大于x的区域交换到右边
+    while(true)
     {
-        int i=p,j=r+1;
-        int x=a[p];
-        //将小于x的元素交换到左边，大于x的区域交换到右边
-        while(true)
-        {
-            while(a[++i]<x&&i<r);
-            while(a[--j]>x);
-            if(i>=j) break;
-            swap(a[i],a[j]);
-        }
-        a[p]=a[j];
-        a[j]=x;
-        return j;
+        while(a[++i]<x&&i<r);
+        while(a[--j]>x);
+        if(i>=j) break;
+        swap(a[i],a[j]);
     }
-    void QuickSort(int a[],int p,int r)
+    a[p]=a[j];
+    a[j]=x;
+    return j;
+}
+void QuickSort(int a[],int p,int r)
+{
+    if(p<r)
     {
-        if(p<r)
-        {
-            int q=Partition(int a[],int p,int r);
-            QuickSort(a,p,q-1);
-            QuickSort(a,q+1,r);
-        }
+        int q=Partition(int a[],int p,int r);
+        QuickSort(a,p,q-1);
+        QuickSort(a,q+1,r);
     }
-    //以下为采用随机策略的快速排序算法
-    void RandomizedQuickSort(int a[],int p,int r)
+}
+//以下为采用随机策略的快速排序算法
+void RandomizedQuickSort(int a[],int p,int r)
+{
+    if(p<r)
     {
-        if(p<r)
-        {
-            int q=RandomizedPartition(int a[],int p,int r);
-            RandomizedQuickSort(a,p,q-1);
-            RandomizedQuickSort(a,q+1,r);
-        }
+        int q=RandomizedPartition(int a[],int p,int r);
+        RandomizedQuickSort(a,p,q-1);
+        RandomizedQuickSort(a,q+1,r);
     }
-    int RandomizedPartition(int a[],int p,int r)
-    {
-        int i=Random(p,r);
-        Swap(a[i],a[p]);
-        return Partition(a,p,r);
-    }
-    ```
+}
+int RandomizedPartition(int a[],int p,int r)
+{
+    int i=Random(p,r);
+    Swap(a[i],a[p]);
+    return Partition(a,p,r);
+}
+```
 
 ##### 4. 找数组a[0:n-1]中的第K小元素，调用RandomizedSelect(a,0,n-1,k)
 
-    ```
-    int RandomizedSelect(int a[],int p,int r,int k)
-    {
-        if(p==r) return a[p];
-        int i=RandomizedPartition(a,p,r),j=i-p+1;
-        if(k<=j) return RandomizedSelect(a,p,i,k);
-        else return RandomizedSelect(a,i+1,r,k-j);
-    }
-    ```
+```
+int RandomizedSelect(int a[],int p,int r,int k)
+{
+    if(p==r) return a[p];
+    int i=RandomizedPartition(a,p,r),j=i-p+1;
+    if(k<=j) return RandomizedSelect(a,p,i,k);
+    else return RandomizedSelect(a,i+1,r,k-j);
+}
+```
 
 ##### 5. 二分搜索分治法
 
@@ -178,97 +178,97 @@
         ① j<w(i) V(i,j)=V(i-1,j)  
         ② j>=w(i)     V(i,j)=max｛ V(i-1,j)，V(i-1,j-w(i))+v(i) ｝
 
-    ```
-    include <iostream>
-    using namespace std;
-    int w[105], val[105];
-    int dp[105][1005];
-    int main()
-    {
-        int t, m, res=-1;
-        cin >> t >> m;
-        for(int i=1; i<=m; i++)
-            cin >> w[i] >> val[i];
-        for(int i=1; i<=m; i++) //物品 
-            for(int j=t; j>=0; j--) //容量 
-            {
-                if(j >= w[i])
-                    dp[i][j] = max(dp[i-1][j-w[i]]+val[i], dp[i-1][j]);
-                else      //只是为了好理解
-                    dp[i][j] = dp[i-1][j];
-            }
-        cout << dp[m][t] << endl;
-        return 0;
-    }
-    ```
-
-    改进后：
-
-    ```
-    int f[1010],w[1010],v[1010];//f记录不同承重量背包的总价值，w记录不同物品的重量，v记录不同物品的价值
-    int max(int x,int y){//返回x,y的最大值
-        if(x>y) return x;
-        return y;
-    }
-    int main(){
-    int t,m,i,j;
-    memset(f,0,sizeof(f));  //总价值初始化为0
-    scanf("%d %d",&t,&m);  //输入背包承重量t、物品的数目m
-    for(i=1;i<=m;i++)
-        scanf("%d %d",&w[i],&v[i]);  //输入m组物品的重量w[i]和价值v[i]
-    for(i=1;i<=m;i++){  //尝试放置每一个物品
-        for(j=t;j>=w[i];j--){//倒叙是为了保证每个物品都使用一次
-            f[j]=max(f[j-w[i]]+v[i],f[j]);
-            //在放入第i个物品前后，检验不同j承重量背包的总价值，如果放入第i个物品后比放入前的价值提高了，则修改j承重量背包的价值，否则不变
+```
+include <iostream>
+using namespace std;
+int w[105], val[105];
+int dp[105][1005];
+int main()
+{
+    int t, m, res=-1;
+    cin >> t >> m;
+    for(int i=1; i<=m; i++)
+        cin >> w[i] >> val[i];
+    for(int i=1; i<=m; i++) //物品 
+        for(int j=t; j>=0; j--) //容量 
+        {
+            if(j >= w[i])
+                dp[i][j] = max(dp[i-1][j-w[i]]+val[i], dp[i-1][j]);
+            else      //只是为了好理解
+                dp[i][j] = dp[i-1][j];
         }
+    cout << dp[m][t] << endl;
+    return 0;
+}
+```
+
+改进后：
+
+```
+int f[1010],w[1010],v[1010];//f记录不同承重量背包的总价值，w记录不同物品的重量，v记录不同物品的价值
+int max(int x,int y){//返回x,y的最大值
+    if(x>y) return x;
+    return y;
+}
+int main(){
+int t,m,i,j;
+memset(f,0,sizeof(f));  //总价值初始化为0
+scanf("%d %d",&t,&m);  //输入背包承重量t、物品的数目m
+for(i=1;i<=m;i++)
+    scanf("%d %d",&w[i],&v[i]);  //输入m组物品的重量w[i]和价值v[i]
+for(i=1;i<=m;i++){  //尝试放置每一个物品
+    for(j=t;j>=w[i];j--){//倒叙是为了保证每个物品都使用一次
+        f[j]=max(f[j-w[i]]+v[i],f[j]);
+        //在放入第i个物品前后，检验不同j承重量背包的总价值，如果放入第i个物品后比放入前的价值提高了，则修改j承重量背包的价值，否则不变
     }
-    printf("%d",f[t]);  //输出承重量为t的背包的总价
-    ```
+}
+printf("%d",f[t]);  //输出承重量为t的背包的总价
+```
 
 ##### 3. [矩阵连乘法代码和讲解](https://www.jianshu.com/p/59f6fac01315)
 
-    ```
-    void MatrixChain(int n, int p[], int **m, int **s)
+```
+void MatrixChain(int n, int p[], int **m, int **s)
+{
+    //以下双重循环对m[][]的上三角进行填表
+    //填表顺序为自底向上，自左向右
+    for (int i = n; i >= 1; i--) //i表示行
     {
-        //以下双重循环对m[][]的上三角进行填表
-        //填表顺序为自底向上，自左向右
-        for (int i = n; i >= 1; i--) //i表示行
+        for (int j = i; j <= n; j++) //j表示列，因为只填上三角，所以j的初值为i
         {
-            for (int j = i; j <= n; j++) //j表示列，因为只填上三角，所以j的初值为i
+            //以下按照矩阵连乘问题的递归公式来求每一个m[i][j]
+            if (i == j)
             {
-                //以下按照矩阵连乘问题的递归公式来求每一个m[i][j]
-                if (i == j)
+                m[i][j] = 0;
+            }
+            else
+            {
+                m[i][j] = m[i][i] + m[i + 1][j] + p[i- 1] * p[i] * p[j]; //若i与j不相等，m[i][j]的初值为断开位置为i时的最优值
+                s[i][j] = i;                    //记录当前断开位置位置为i
+                for (int k = i + 1; k < j; k++) //k用于尝试不同的断开位置
                 {
-                    m[i][j] = 0;
-                }
-                else
-                {
-                    m[i][j] = m[i][i] + m[i + 1][j] + p[i- 1] * p[i] * p[j]; //若i与j不相等，m[i][j]的初值为断开位置为i时的最优值
-                    s[i][j] = i;                    //记录当前断开位置位置为i
-                    for (int k = i + 1; k < j; k++) //k用于尝试不同的断开位置
+                    int curr = m[i][k] + m[k + 1][j] + p[i- 1] * p[k] * p[j];
+                    if (curr < m[i][j]) //当前k值作为Ai连乘到Aj的断开位置能获得更少计算量
                     {
-                        int curr = m[i][k] + m[k + 1][j] + p[i- 1] * p[k] * p[j];
-                        if (curr < m[i][j]) //当前k值作为Ai连乘到Aj的断开位置能获得更少计算量
-                        {
-                            m[i][j] = curr; //刷新最优值
-                            s[i][j] = k;   //刷新相应断开位置
-                        }
+                        m[i][j] = curr; //刷新最优值
+                        s[i][j] = k;   //刷新相应断开位置
                     }
                 }
             }
         }
     }
+}
 
-    void Traceback(int i,int j,int **s)
-    {
-        if(i==j)
-            return;
-        Traceback(i,s[i][j],s);
-        Traceback(s[i][j]+1,j,s);
-        cout<<"Multiply A"<<i<<", "<<s[i][j];
-        cout<<" and A "<<(s[i][j]+1)<<", "<<j<<endl;
-    }
-    ```
+void Traceback(int i,int j,int **s)
+{
+    if(i==j)
+        return;
+    Traceback(i,s[i][j],s);
+    Traceback(s[i][j]+1,j,s);
+    cout<<"Multiply A"<<i<<", "<<s[i][j];
+    cout<<" and A "<<(s[i][j]+1)<<", "<<j<<endl;
+}
+```
 
 ##### 4. [最长公共子序列问题](https://www.cnblogs.com/wkfvawl/p/9362287.html)
 ##### 5. 最大子段和
@@ -284,100 +284,100 @@
 
 ##### 2. 背包问题代码贪心标准：按单位重量价值降序排列，从头开始选择物品。
 
-    ```
-    void Knapsack(int n,float M,float v[],float w[],float x[])
+```
+void Knapsack(int n,float M,float v[],float w[],float x[])
+{
+    Sort(n,v,w);//将n个物品按单位价值(v/w)进行排序
+    int i;
+    for(i=1;i<=n;i++)
     {
-        Sort(n,v,w);//将n个物品按单位价值(v/w)进行排序
-        int i;
-        for(i=1;i<=n;i++)
-        {
-            x[i]=0;  //解向量
-        }
-        float c=M;
-        for(i=1;i<=n;i++)
-        {
-            if(w[i]>c)
-            {
-                break;
-            }
-            x[i]=1;
-            c -= w[i];
-        }
-        if(i<=n)
-        {
-            x[i]=c/w[i];
-        }
+        x[i]=0;  //解向量
     }
-    ```
+    float c=M;
+    for(i=1;i<=n;i++)
+    {
+        if(w[i]>c)
+        {
+            break;
+        }
+        x[i]=1;
+        c -= w[i];
+    }
+    if(i<=n)
+    {
+        x[i]=c/w[i];
+    }
+}
+```
 
 ##### 3. 最优装载问题(p100)
 
-    ```
-    void loading(int x[],int w[],int c,int n)
+```
+void loading(int x[],int w[],int c,int n)
+{
+    int *t=new int[n+1];
+    Sort(w,t,n);
+    for(int i=1;i<=n;i++)
     {
-        int *t=new int[n+1];
-        Sort(w,t,n);
-        for(int i=1;i<=n;i++)
-        {
-            x[i]=0;
-        }
-        for(int i=1;i<=n&&w[t[i]]<=c;i++)
-        {
-            x[t[i]]=1;
-            c-=w[t[i]];
-        }
+        x[i]=0;
     }
-    ```
+    for(int i=1;i<=n&&w[t[i]]<=c;i++)
+    {
+        x[t[i]]=1;
+        c-=w[t[i]];
+    }
+}
+```
 
 ##### 4. 单源最短路径代码：
-    ```
-    //Dijkstra算法函数，求给定顶点到其余各点的最短路径
-    //参数：邻接矩阵、出发点的下标、结果数组、路径前一点记录
-    void Dijkstra(int Cost[][N], int v0, int Distance[], int prev[])
+```
+//Dijkstra算法函数，求给定顶点到其余各点的最短路径
+//参数：邻接矩阵、出发点的下标、结果数组、路径前一点记录
+void Dijkstra(int Cost[][N], int v0, int Distance[], int prev[])
+{
+    int s[N];
+    int mindis,dis;
+    int i, j, u;
+    //初始化
+    for(i=0; i<N; i++)
     {
-        int s[N];
-        int mindis,dis;
-        int i, j, u;
-        //初始化
-        for(i=0; i<N; i++)
-        {
-            Distance[i] = Cost[v0][i];
-            s[i] = 0;
-            if(Distance[i] == M)
-                prev[i] = -1;
-            else
-                prev[i] = v0;
-        }
-        Distance[v0] = 0;
-        s[v0] = 1; //标记v0
-        //在当前还未找到最短路径的顶点中，
-        //寻找具有最短距离的顶点
-        for(i=1; i < N; i++)
-        {//每循环一次，求得一个最短路径
-            mindis = M;
-            u = v0;
-            for (j=0; j < N; j++) //求离出发点最近的顶点
-                if(s[j]==0 && Distance[j]<mindis)
-                {
-                    mindis = Distance [j];
-                    u = j;
-                } // if语句体结束，j循环结束
-            s[u] = 1;
-            for(j=0; j<N; j++) //修改递增路径序列（集合）
-            if(s[j]==0 && Cost[u][j]<M)
-            { //对还未求得最短路径的顶点
-                //求出由最近的顶点 直达各顶点的距离
-                dis = Distance[u] +Cost[u][j];
-                // 如果新的路径更短，就替换掉原路径
-                if(Distance[j] > dis)
-                {
-                    Distance[j] = dis;
-                    prev[j] = u;
-                }
-            } // if 语句体结束，j循环结束
-        } // i循环结束
+        Distance[i] = Cost[v0][i];
+        s[i] = 0;
+        if(Distance[i] == M)
+            prev[i] = -1;
+        else
+            prev[i] = v0;
     }
-    ```
+    Distance[v0] = 0;
+    s[v0] = 1; //标记v0
+    //在当前还未找到最短路径的顶点中，
+    //寻找具有最短距离的顶点
+    for(i=1; i < N; i++)
+    {//每循环一次，求得一个最短路径
+        mindis = M;
+        u = v0;
+        for (j=0; j < N; j++) //求离出发点最近的顶点
+            if(s[j]==0 && Distance[j]<mindis)
+            {
+                mindis = Distance [j];
+                u = j;
+            } // if语句体结束，j循环结束
+        s[u] = 1;
+        for(j=0; j<N; j++) //修改递增路径序列（集合）
+        if(s[j]==0 && Cost[u][j]<M)
+        { //对还未求得最短路径的顶点
+            //求出由最近的顶点 直达各顶点的距离
+            dis = Distance[u] +Cost[u][j];
+            // 如果新的路径更短，就替换掉原路径
+            if(Distance[j] > dis)
+            {
+                Distance[j] = dis;
+                prev[j] = u;
+            }
+        } // if 语句体结束，j循环结束
+    } // i循环结束
+}
+```
 
 ##### 5. prim和Kruskal算法
     
@@ -402,34 +402,34 @@
     
 - 当所给问题是从n个元素的集合中找出满足某种性质的子集时，相应的解空间树称为**子集树**。
 
-        ```
-        void backtrack (int t)  
-        {
-            if (t>n) output(x);  
-            else  
-                for (int i=0;i<=1;i++) {  
-                    x[t]=i;  
-                    if (legal(t)) backtrack(t+1);  
-                }  
-        }
+    ```
+    void backtrack (int t)  
+    {
+        if (t>n) output(x);  
+        else  
+            for (int i=0;i<=1;i++) {  
+                x[t]=i;  
+                if (legal(t)) backtrack(t+1);  
+            }  
+    }
 
-        ```
+    ```
 
     
 - 当所给问题是确定n个元素满足某种性质的排列时，相应的解空间树称为**排列树**。
 
-        ```
-            void backtrack (int t)  
-            {
-                if (t>n) output(x);  
-                else  
-                    for (int i=t;i<=n;i++) {  
-                        swap(x[t], x[i]);  
-                        if (legal(t)) backtrack(t+1);  
-                        swap(x[t], x[i]);  
-                    }  
-            }
-        ```
+    ```
+        void backtrack (int t)  
+        {
+            if (t>n) output(x);  
+            else  
+                for (int i=t;i<=n;i++) {  
+                    swap(x[t], x[i]);  
+                    if (legal(t)) backtrack(t+1);  
+                    swap(x[t], x[i]);  
+                }  
+        }
+    ```
 
     当所给的问题是从n个元素的集合S中找出满足某种性质的子集时，相应的解空间树成为子集树。
     当所给的问题是确定n个元素满足某种性质的排列时，相应的解空间树称为排列树。排列树通常有n!个叶节点。
